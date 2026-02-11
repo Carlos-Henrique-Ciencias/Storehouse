@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import api from '../api';
-import { TrendingDown, Package, ShieldCheck } from 'lucide-react';
+import { TrendingDown, Package, ShieldCheck, LayoutDashboard } from 'lucide-react';
 
 export default function Dashboard() {
   const [metrics, setMetrics] = useState({ totalAssets: 0, totalValue: 0, currentValue: 0 });
@@ -16,14 +16,20 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h2 className="text-3xl font-black text-gray-800 uppercase tracking-tight">Painel Geral</h2>
-        <p className="text-green-700 font-bold text-sm uppercase tracking-widest">Visão Estratégica do Patrimônio</p>
+      {/* CABEÇALHO PADRÃO (IGUAL TOMBAMENTO/INVENTÁRIO) */}
+      <div className="flex items-center gap-4 pb-4 border-b border-gray-200">
+        <div className="bg-orange-600 p-3 rounded-2xl text-white shadow-lg shadow-orange-900/20">
+            <LayoutDashboard size={28} />
+        </div>
+        <div>
+           <h2 className="text-3xl font-black text-gray-800 uppercase tracking-tight">Painel Geral</h2>
+           <p className="text-sm font-bold text-orange-600 uppercase tracking-wider">Visão Estratégica do Patrimônio</p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Card Verde - Ativos */}
-        <div className="bg-white p-8 rounded-2xl border border-green-100 shadow-lg shadow-green-900/5 flex items-center gap-6 group hover:border-green-300 transition-all">
+        <div className="bg-white p-8 rounded-2xl border border-green-100 shadow-lg shadow-green-900/5 flex items-center gap-6 group hover:border-green-300 transition-all hover:-translate-y-1">
           <div className="bg-green-100 p-4 rounded-xl text-green-700 group-hover:bg-green-600 group-hover:text-white transition-all">
              <Package size={32} />
           </div>
@@ -34,7 +40,7 @@ export default function Dashboard() {
         </div>
 
         {/* Card Azul - Investimento */}
-        <div className="bg-white p-8 rounded-2xl border border-blue-100 shadow-lg shadow-blue-900/5 flex items-center gap-6 group hover:border-blue-300 transition-all">
+        <div className="bg-white p-8 rounded-2xl border border-blue-100 shadow-lg shadow-blue-900/5 flex items-center gap-6 group hover:border-blue-300 transition-all hover:-translate-y-1">
            <div className="bg-blue-100 p-4 rounded-xl text-blue-700 group-hover:bg-blue-600 group-hover:text-white transition-all">
              <ShieldCheck size={32} />
           </div>
@@ -45,7 +51,7 @@ export default function Dashboard() {
         </div>
 
         {/* Card Amarelo/Dourado - Valor Atual */}
-        <div className="bg-white p-8 rounded-2xl border border-yellow-100 shadow-lg shadow-yellow-900/5 flex items-center gap-6 group hover:border-yellow-300 transition-all">
+        <div className="bg-white p-8 rounded-2xl border border-yellow-100 shadow-lg shadow-yellow-900/5 flex items-center gap-6 group hover:border-yellow-300 transition-all hover:-translate-y-1">
            <div className="bg-yellow-100 p-4 rounded-xl text-yellow-700 group-hover:bg-yellow-500 group-hover:text-white transition-all">
              <TrendingDown size={32} />
           </div>

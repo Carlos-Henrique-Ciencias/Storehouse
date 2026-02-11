@@ -1,18 +1,49 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api';
-import { Settings, History, Trash2, ClipboardList, Search } from 'lucide-react';
+import { Settings, History, Trash2, ClipboardList, Download, Search } from 'lucide-react';
 
 export default function Inventario() {
   const [assets, setAssets] = useState([]);
+  const [term, setTerm] = useState('');
+
   const load = () => api.get('/Asset/relatorio').then(res => setAssets(res.data)).catch(console.error);
   useEffect(() => { load(); }, []);
 
   const handleDelete = async (tag) => {
-    if (window.confirm(`Deseja apagar ${tag}?`)) {
+    if (window.confirm(`Deseja realmente baixar/excluir o item ${tag}?`)) {
       try { await api.delete(`/Asset/${encodeURIComponent(tag)}`); load(); } catch (err) { alert("Erro ao excluir."); }
     }
   };
+
+  // Lógica para exportar CSV (Cumpre RN02 - Portabilidade)
+  const handleExport = () => {
+    if (assets.length === 0) return alert("Nada para exportar.");
+    
+    // Cabeçalho do CSV
+    let csv = "Etiqueta;Descricao;Setor;Responsavel;Valor_Aquisicao;Valor_Atual;Status;Vida_Util_Meses\n";
+    
+    // Linhas
+    assets.forEach(a => {
+        csv += `${a.tag};${a.description};${a.department};${a.responsible};${a.originalValue};${a.currentValue};${a.status};${a.usefulLife}\n`;
+    });
+
+    // Download
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `inventario_ourolandia_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+  };
+
+  // Filtro de busca simples
+  const filtered = assets.filter(a => 
+    a.description.toLowerCase().includes(term.toLowerCase()) || 
+    a.tag.toLowerCase().includes(term.toLowerCase()) ||
+    a.department.toLowerCase().includes(term.toLowerCase())
+  );
 
   return (
     <div className="space-y-8">
@@ -24,14 +55,25 @@ export default function Inventario() {
                 <p className="text-sm font-bold text-blue-700 uppercase tracking-wider">Base de Dados Oficial</p>
             </div>
         </div>
-        <div className="bg-white border-2 border-blue-100 text-blue-800 px-6 py-2 rounded-full font-black text-sm shadow-sm flex items-center gap-2">
-            <span className="text-xl">{assets.length}</span> ITENS REGISTRADOS
+        <div className="flex gap-3">
+             <button onClick={handleExport} className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-xl font-bold text-sm shadow-md flex items-center gap-2 transition-all">
+                <Download size={18} /> EXPORTAR DADOS (RN02)
+            </button>
+            <div className="bg-white border-2 border-blue-100 text-blue-800 px-6 py-2 rounded-xl font-black text-sm shadow-sm flex items-center gap-2">
+                <span className="text-xl">{filtered.length}</span> ITENS
+            </div>
         </div>
       </div>
 
       <div className="bg-white border border-gray-100 rounded-[2rem] overflow-hidden shadow-xl">
-        <div className="p-4 bg-gray-50 border-b border-gray-100 flex items-center gap-2 text-gray-400">
-            <Search size={18} /> <span className="text-sm font-bold tracking-widest uppercase">Filtro Rápido (Em breve)</span>
+        <div className="p-4 bg-gray-50 border-b border-gray-100 flex items-center gap-2 text-gray-500">
+            <Search size={20} /> 
+            <input 
+                className="bg-transparent outline-none font-bold uppercase text-sm w-full placeholder-gray-400" 
+                placeholder="FILTRAR POR NOME, PLAQUETA OU SETOR..." 
+                value={term}
+                onChange={e => setTerm(e.target.value)}
+            />
         </div>
         <table className="w-full text-left">
           <thead className="bg-gray-50 text-gray-500 text-xs uppercase font-black tracking-widest border-b border-gray-200">
@@ -44,7 +86,7 @@ export default function Inventario() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 bg-white">
-            {assets.map(asset => (
+            {filtered.map(asset => (
               <tr key={asset.tag} className="hover:bg-blue-50/50 transition-all font-medium text-gray-700">
                 <td className="p-6 font-mono text-blue-700 font-bold text-base">{asset.tag}</td>
                 <td className="p-6 text-sm">{asset.description}</td>
