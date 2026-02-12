@@ -1,13 +1,22 @@
 using System;
+
 namespace Codebros.Domain.Entities;
+
 public class Movement {
     public int Id { get; set; }
-    public string AssetTagNumber { get; set; } = null!;
-    public string Type { get; set; } = null!;
-    public DateTime OccurredAt { get; set; }
-    public string Destination { get; set; } = null!;
+    public required string TagNumber { get; set; }
+    public required string Action { get; set; }
+    public required string Description { get; set; }
+    public required string User { get; set; }
+    public DateTime Date { get; set; } = DateTime.UtcNow;
+
     public Movement() { }
-    public Movement(string tag, string type, string dest) {
-        AssetTagNumber = tag; Type = type; Destination = dest; OccurredAt = DateTime.UtcNow;
+    
+    [System.Diagnostics.CodeAnalysis.SetsRequiredMembers]
+    public Movement(string tag, string action, string desc, string user) {
+        TagNumber = tag;
+        Action = action;
+        Description = desc;
+        User = user;
     }
 }
